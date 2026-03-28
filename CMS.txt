@@ -1,0 +1,44 @@
+🚀 Step 1: Terminal Setup
+Open your project folder in VS Code.
+
+Open the terminal inside VS Code (Go to Terminal -> New Terminal or press Ctrl + ~).
+
+Type the following command and press Enter:
+
+Bash
+[[[[[[python app.py]]]]]]
+Look for this message in the terminal:
+
+* Running on http://127.0.0.1:5000
+
+Note: Keep this terminal open! If you close it, the website will stop working.
+
+🌐 Step 2: Open in Browser
+Open your Chrome or Edge browser.
+
+Do NOT drag and drop files into the browser.
+
+In the address bar at the top, manually type:
+http://127.0.0.1:5000
+
+Press Enter. You should now see your Login Page.
+
+🔄 Step 3: Test the Workflow
+Register: Click "Register Now," fill in a name, email, and password. Hit "Create Account."
+
+Login: You will be sent back to the login page. Use the email and password you just created.
+
+Submit Complaint: Fill out the form on the User Dashboard and click "Submit."
+
+Admin View: * Logout.
+
+Login with: admin@test.com and admin123.
+
+You will see the complaint you just filed and can update its status.
+
+🛠️ Common Troubleshooting
+"Address already in use": This means a server is already running. Close the terminal and start a new one.
+
+"ModuleNotFoundError": If it says "No module named flask," type pip install flask in the terminal first.
+
+database.json: Once you run the server and load the page, this file will appear in your folder automatically.

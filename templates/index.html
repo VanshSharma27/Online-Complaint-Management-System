@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS · My Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --bg:#0f1117;--surface:#181b23;--surface2:#1e2230;
+            --border:rgba(255,255,255,0.07);--border-h:rgba(255,255,255,0.12);
+            --accent:#4f7cff;--accent-soft:rgba(79,124,255,0.1);--accent-glow:rgba(79,124,255,0.22);
+            --text:#e2e4ed;--text-dim:#8b8fa8;--text-faint:#4a4d5e;
+            --success:#34c97a;--warning:#e8a93c;--info:#60a5fa;--danger:#f05454;
+            --success-s:rgba(52,201,122,0.1);--warning-s:rgba(232,169,60,0.1);
+            --info-s:rgba(96,165,250,0.1);--danger-s:rgba(240,84,84,0.1);
+        }
+        body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+        .navbar{background:rgba(15,17,23,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;animation:navDown 0.5s cubic-bezier(0.16,1,0.3,1) both;}
+        @keyframes navDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+        .nav-brand{font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;display:flex;align-items:center;gap:0.5rem;}
+        .nav-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);}
+        .nav-right{display:flex;align-items:center;gap:0.85rem;}
+        .avatar{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#6741d9);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;}
+        .nav-user{font-size:0.82rem;color:var(--text-dim);}
+        .btn-logout{padding:0.38rem 0.85rem;border-radius:8px;background:var(--danger-s);border:1px solid rgba(240,84,84,0.18);color:var(--danger);font-size:0.76rem;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:0.3rem;transition:all 0.2s;}
+        .btn-logout:hover{background:rgba(240,84,84,0.18);}
+        .container{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;}
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem;}
+        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.15rem 1.3rem;position:relative;overflow:hidden;transition:transform 0.25s;animation:fadeUp 0.55s cubic-bezier(0.16,1,0.3,1) both;}
+        .stat-card:hover{transform:translateY(-3px);}
+        .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0;}
+        .sc-total::before{background:var(--accent);}.sc-pending::before{background:var(--warning);}
+        .sc-inprog::before{background:var(--info);}.sc-resolved::before{background:var(--success);}
+        .stat-label{font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem;font-weight:600;}
+        .stat-val{font-weight:800;font-size:1.85rem;line-height:1;}
+        .stat-icon{position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:1.6rem;opacity:0.06;}
+        .sc-total .stat-val{color:var(--accent);}.sc-pending .stat-val{color:var(--warning);}
+        .sc-inprog .stat-val{color:var(--info);}.sc-resolved .stat-val{color:var(--success);}
+        .main-grid{display:grid;grid-template-columns:370px 1fr;gap:1.5rem;align-items:start;}
+        .form-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1.75rem;position:sticky;top:78px;animation:fadeUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.1s both;}
+        .hist-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1.75rem;animation:fadeUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.18s both;}
+        .sec-title{font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;margin-bottom:0.2rem;}
+        .sec-sub{color:var(--text-dim);font-size:0.78rem;margin-bottom:1.4rem;}
+        .flash-msg{padding:0.6rem 0.85rem;border-radius:10px;font-size:0.78rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.45rem;animation:flashIn 0.3s ease;}
+        @keyframes flashIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+        .flash-success{background:var(--success-s);border:1px solid rgba(52,201,122,0.2);color:var(--success);}
+        .flash-danger{background:var(--danger-s);border:1px solid rgba(240,84,84,0.2);color:var(--danger);}
+        .flash-info{background:var(--info-s);border:1px solid rgba(96,165,250,0.2);color:var(--info);}
+        .form-group{margin-bottom:1rem;}
+        label{display:block;font-size:0.68rem;font-weight:700;color:var(--text-dim);margin-bottom:0.38rem;text-transform:uppercase;letter-spacing:0.07em;}
+        input[type="text"],select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:0.72rem 0.88rem;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.86rem;outline:none;transition:all 0.2s;}
+        input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-glow);}
+        input::placeholder,textarea::placeholder{color:var(--text-faint);}
+        select{cursor:pointer;} select option{background:#181b23;}
+        textarea{resize:vertical;min-height:78px;}
+        .route-preview{margin-top:0.55rem;padding:0.55rem 0.8rem;border-radius:8px;background:var(--accent-soft);border:1px solid rgba(79,124,255,0.18);font-size:0.73rem;color:#a5bbff;display:none;}
+        .route-preview.show{display:flex;align-items:center;gap:0.4rem;}
+        .btn-submit{width:100%;padding:0.82rem;margin-top:0.4rem;background:linear-gradient(135deg,var(--accent),#6741d9);border:none;border-radius:12px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.22s;display:flex;align-items:center;justify-content:center;gap:0.4rem;box-shadow:0 4px 16px rgba(79,124,255,0.28);}
+        .btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,124,255,0.42);}
+        .btn-submit:active{transform:scale(0.985);}
+        .complaint-list{display:flex;flex-direction:column;gap:0.65rem;}
+        .complaint-item{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:1rem 1.15rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;transition:all 0.2s;animation:fadeUp 0.45s cubic-bezier(0.16,1,0.3,1) both;}
+        .complaint-item:hover{border-color:var(--border-h);transform:translateX(2px);}
+        .ci-left{flex:1;min-width:0;}
+        .ci-subject{font-weight:700;font-size:0.9rem;margin-bottom:0.3rem;}
+        .ci-tags{display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.3rem;}
+        .cat-tag{font-size:0.68rem;padding:0.15rem 0.55rem;border-radius:5px;background:var(--accent-soft);border:1px solid rgba(79,124,255,0.18);color:#a5bbff;}
+        .cat-tag.secondary{background:rgba(240,84,84,0.08);border-color:rgba(240,84,84,0.18);color:#ffa5a5;}
+        .ci-desc{font-size:0.77rem;color:var(--text-dim);}
+        .admin-resp{margin-top:0.35rem;padding:0.38rem 0.65rem;border-radius:6px;background:rgba(79,124,255,0.06);border-left:2px solid var(--accent);font-size:0.73rem;color:var(--text-dim);}
+        .ci-date{font-size:0.7rem;color:var(--text-faint);margin-top:0.3rem;display:flex;align-items:center;gap:0.3rem;}
+        .badge{padding:0.25rem 0.7rem;border-radius:20px;font-size:0.7rem;font-weight:700;flex-shrink:0;}
+        .bp{background:var(--warning-s);border:1px solid rgba(232,169,60,0.22);color:var(--warning);}
+        .bi2{background:var(--info-s);border:1px solid rgba(96,165,250,0.22);color:var(--info);}
+        .br{background:var(--success-s);border:1px solid rgba(52,201,122,0.22);color:var(--success);}
+        .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text-dim);}
+        .empty-state i{font-size:2.2rem;opacity:0.2;display:block;margin-bottom:0.65rem;}
+        /* ── Photo Upload Styles ── */
+        .upload-box{width:100%;background:var(--surface2);border:1.5px dashed var(--border-h);border-radius:10px;padding:0.9rem 0.88rem;color:var(--text-dim);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;outline:none;transition:all 0.2s;cursor:pointer;display:flex;align-items:center;gap:0.5rem;}
+        .upload-box:hover{border-color:var(--accent);color:var(--text);}
+        input[type="file"]{display:none;}
+        .upload-label{display:flex;align-items:center;gap:0.5rem;cursor:pointer;width:100%;background:var(--surface2);border:1.5px dashed var(--border-h);border-radius:10px;padding:0.72rem 0.88rem;color:var(--text-dim);font-size:0.82rem;transition:all 0.2s;}
+        .upload-label:hover{border-color:var(--accent);color:var(--text);}
+        .upload-label i{font-size:1rem;color:var(--accent);}
+        .file-preview{margin-top:0.5rem;padding:0.45rem 0.7rem;border-radius:8px;background:rgba(79,124,255,0.07);border:1px solid rgba(79,124,255,0.15);font-size:0.73rem;color:#a5bbff;display:none;align-items:center;gap:0.4rem;}
+        .file-preview.show{display:flex;}
+        .ci-proof{margin-top:0.4rem;}
+        .ci-proof img{max-width:180px;border-radius:8px;border:1px solid var(--border-h);margin-top:0.25rem;cursor:pointer;transition:transform 0.2s;}
+        .ci-proof img:hover{transform:scale(1.03);}
+        .ci-proof a{font-size:0.73rem;color:var(--accent);display:inline-flex;align-items:center;gap:0.25rem;text-decoration:none;margin-top:0.25rem;}
+        .ci-proof a:hover{text-decoration:underline;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}.main-grid{grid-template-columns:1fr;}.form-card{position:static;}}
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-brand"><div class="nav-dot"></div>ComplaintMS</div>
+    <div class="nav-right">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div class="avatar">{{ session['user'][0].upper() }}</div>
+            <span class="nav-user">{{ session['user'] }}</span>
+        </div>
+        <a href="/logout" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="stats-grid">
+        <div class="stat-card sc-total" style="animation-delay:0s">
+            <div class="stat-label">Total Filed</div>
+            <div class="stat-val">{{ stats.total }}</div>
+            <div class="stat-icon"><i class="bi bi-folder2-open"></i></div>
+        </div>
+        <div class="stat-card sc-pending" style="animation-delay:0.06s">
+            <div class="stat-label">Pending</div>
+            <div class="stat-val">{{ stats.pending }}</div>
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+        </div>
+        <div class="stat-card sc-inprog" style="animation-delay:0.12s">
+            <div class="stat-label">In Progress</div>
+            <div class="stat-val">{{ stats.inprogress }}</div>
+            <div class="stat-icon"><i class="bi bi-arrow-repeat"></i></div>
+        </div>
+        <div class="stat-card sc-resolved" style="animation-delay:0.18s">
+            <div class="stat-label">Resolved</div>
+            <div class="stat-val">{{ stats.resolved }}</div>
+            <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div class="form-card">
+            <div class="sec-title">File a Complaint</div>
+            <div class="sec-sub">Auto-routed to the right department instantly</div>
+            {% with msgs = get_flashed_messages(with_categories=true) %}
+                {% for cat, msg in msgs %}
+                <div class="flash-msg flash-{{ cat }}">
+                    <i class="bi bi-{{ 'check-circle-fill' if cat == 'success' else 'exclamation-circle-fill' if cat == 'danger' else 'info-circle-fill' }}"></i>{{ msg }}
+                </div>
+                {% endfor %}
+            {% endwith %}
+            <form action="/submit_complaint" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" name="subject" placeholder="Brief title of your issue" required>
+                </div>
+                <div class="form-group">
+                    <label>Primary Category <span style="color:var(--danger)">*</span></label>
+                    <select name="primary_category" id="primaryCat" required onchange="updateRoutePreview()">
+                        <option value="" disabled selected>Select main category</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}">{{ category_icons[cat] }} {{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Secondary Category <span style="color:var(--text-faint)">(optional)</span></label>
+                    <select name="secondary_category" id="secondaryCat" onchange="updateRoutePreview()">
+                        <option value="None">— None —</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}">{{ category_icons[cat] }} {{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="route-preview" id="routePreview">
+                        <i class="bi bi-diagram-3"></i>
+                        <span id="routeText"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" placeholder="Describe your issue in detail..." required></textarea>
+                </div>
+                <!-- ── Proof / Evidence Upload ── -->
+                <div class="form-group">
+                    <label>📎 Proof / Evidence <span style="color:var(--text-faint)">(optional)</span></label>
+                    <input type="file" id="proofInput" name="proof_photo" accept="image/png,image/jpeg,image/jpg,application/pdf,video/mp4" onchange="showFilePreview(this)">
+                    <label for="proofInput" class="upload-label">
+                        <i class="bi bi-cloud-arrow-up"></i>
+                        <span id="uploadText">Click to upload photo, PDF or video</span>
+                    </label>
+                    <div class="file-preview" id="filePreview">
+                        <i class="bi bi-paperclip"></i>
+                        <span id="fileName"></span>
+                        <span style="margin-left:auto;cursor:pointer;color:var(--danger);" onclick="clearFile()"><i class="bi bi-x-circle"></i></span>
+                    </div>
+                    <div style="font-size:0.68rem;color:var(--text-faint);margin-top:0.3rem;">Supported: JPG, PNG, PDF, MP4 · Max 10MB</div>
+                </div>
+                <!-- ───────────────────────────── -->
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-send-fill"></i> Submit & Route
+                </button>
+            </form>
+        </div>
+
+        <div class="hist-card">
+            <div class="sec-title">My Complaints</div>
+            <div class="sec-sub">Track status and department responses</div>
+            {% if complaints %}
+            <div class="complaint-list">
+                {% for c in complaints %}
+                <div class="complaint-item" style="animation-delay:{{ loop.index0 * 0.06 }}s">
+                    <div class="ci-left">
+                        <div class="ci-subject">{{ c.subject }}</div>
+                        <div class="ci-tags">
+                            <span class="cat-tag">{{ category_icons.get(c.primary_category,'📌') }} {{ c.primary_category }}</span>
+                            {% if c.secondary_category and c.secondary_category != 'None' %}
+                            <span class="cat-tag secondary">{{ category_icons.get(c.secondary_category,'📌') }} {{ c.secondary_category }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="ci-desc">{{ c.description[:90] }}{% if c.description|length > 90 %}…{% endif %}</div>
+                        {% if c.admin_response %}
+                        <div class="admin-resp">💬 {{ c.admin_response }}</div>
+                        {% endif %}
+                        <!-- ── Proof Photo Display ── -->
+                        {% if c.proof_photo %}
+                        <div class="ci-proof">
+                            {% set ext = c.proof_photo.rsplit('.', 1)[-1].lower() %}
+                            {% if ext in ['jpg', 'jpeg', 'png'] %}
+                                <img src="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" alt="Proof">
+                            {% elif ext == 'pdf' %}
+                                <a href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank"><i class="bi bi-file-earmark-pdf"></i> View PDF Proof</a>
+                            {% elif ext == 'mp4' %}
+                                <a href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank"><i class="bi bi-play-circle"></i> View Video Proof</a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        <!-- ───────────────────────── -->
+                        <div class="ci-date"><i class="bi bi-clock"></i>{{ c.date }}</div>
+                    </div>
+                    <span class="badge {% if c.status=='Pending' %}bp{% elif c.status=='In Progress' %}bi2{% else %}br{% endif %}">{{ c.status }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <p>No complaints yet. File your first one above.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+const icons = {{ category_icons | tojson }};
+function updateRoutePreview(){
+    const p = document.getElementById('primaryCat').value;
+    const s = document.getElementById('secondaryCat').value;
+    const preview = document.getElementById('routePreview');
+    const text = document.getElementById('routeText');
+    if(!p){ preview.classList.remove('show'); return; }
+    let msg = `Routes → ${icons[p]||''} ${p} Admin`;
+    if(s && s !== 'None' && s !== p) msg += ` + ${icons[s]||''} ${s} Admin`;
+    text.textContent = msg;
+    preview.classList.add('show');
+}
+function showFilePreview(input){
+    const preview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const uploadText = document.getElementById('uploadText');
+    if(input.files && input.files[0]){
+        const file = input.files[0];
+        fileName.textContent = file.name;
+        uploadText.textContent = file.name;
+        preview.classList.add('show');
+    }
+}
+function clearFile(){
+    document.getElementById('proofInput').value = '';
+    document.getElementById('filePreview').classList.remove('show');
+    document.getElementById('uploadText').textContent = 'Click to upload photo, PDF or video';
+}
+</script>
+<script>
+    document.documentElement.style.opacity = '0';
+    window.addEventListener('DOMContentLoaded', () => {
+        document.documentElement.style.transition = 'opacity 0.4s ease';
+        document.documentElement.style.opacity = '1';
+    });
+    document.addEventListener('click', e => {
+        const a = e.target.closest('a');
+        if (a && !a.target && !a.href.includes('#') && !a.href.startsWith('javascript')) {
+            e.preventDefault();
+            document.documentElement.style.opacity = '0';
+            setTimeout(() => window.location.href = a.href, 280);
+        }
+    });
+</script>
+</body>
+</html>

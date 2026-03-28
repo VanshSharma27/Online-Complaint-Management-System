@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS · {{ admin_category }} Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --bg:#0f1117;--surface:#181b23;--surface2:#1e2230;
+            --border:rgba(255,255,255,0.07);--border-h:rgba(255,255,255,0.12);
+            --accent:#4f7cff;--accent-soft:rgba(79,124,255,0.1);--accent-glow:rgba(79,124,255,0.22);
+            --text:#e2e4ed;--text-dim:#8b8fa8;--text-faint:#4a4d5e;
+            --success:#34c97a;--warning:#e8a93c;--info:#60a5fa;--danger:#f05454;
+            --success-s:rgba(52,201,122,0.1);--warning-s:rgba(232,169,60,0.1);
+            --info-s:rgba(96,165,250,0.1);--danger-s:rgba(240,84,84,0.1);
+        }
+        body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+        .navbar{background:rgba(15,17,23,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;animation:navDown 0.5s cubic-bezier(0.16,1,0.3,1) both;}
+        @keyframes navDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+        .nav-left{display:flex;align-items:center;gap:0.75rem;}
+        .nav-brand{font-weight:800;font-size:1.05rem;letter-spacing:-0.02em;}
+        .dept-badge{padding:0.22rem 0.7rem;border-radius:7px;font-size:0.74rem;font-weight:700;background:var(--accent-soft);border:1px solid rgba(79,124,255,0.22);color:#a5bbff;}
+        .btn-logout{padding:0.38rem 0.85rem;border-radius:8px;background:var(--danger-s);border:1px solid rgba(240,84,84,0.18);color:var(--danger);font-size:0.76rem;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:0.3rem;transition:all 0.2s;}
+        .btn-logout:hover{background:rgba(240,84,84,0.18);}
+        .container{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;}
+        .dept-header{display:flex;align-items:center;gap:1.1rem;margin-bottom:1.75rem;padding:1.35rem 1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:18px;animation:fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;}
+        .dept-icon-big{width:58px;height:58px;border-radius:16px;font-size:1.75rem;background:linear-gradient(135deg,var(--accent),#6741d9);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 24px rgba(79,124,255,0.22);}
+        .dept-info h1{font-weight:800;font-size:1.35rem;letter-spacing:-0.02em;margin-bottom:0.2rem;}
+        .dept-info p{color:var(--text-dim);font-size:0.82rem;}
+        .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.75rem;}
+        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.15rem 1.3rem;position:relative;overflow:hidden;transition:transform 0.25s;animation:fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.06s both;}
+        .stat-card:hover{transform:translateY(-3px);}
+        .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0;}
+        .sc-p::before{background:var(--warning);}.sc-i::before{background:var(--info);}.sc-r::before{background:var(--success);}
+        .stat-label{font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem;font-weight:600;}
+        .stat-val{font-weight:800;font-size:1.85rem;line-height:1;}
+        .sc-p .stat-val{color:var(--warning);}.sc-i .stat-val{color:var(--info);}.sc-r .stat-val{color:var(--success);}
+        .stat-icon{position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:1.6rem;opacity:0.06;}
+        .toolbar{display:flex;align-items:center;gap:0.85rem;margin-bottom:1.25rem;flex-wrap:wrap;animation:fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.12s both;}
+        .toolbar-title{font-weight:800;font-size:1.02rem;letter-spacing:-0.01em;flex:1;}
+        .filter-tabs{display:flex;gap:0.35rem;}
+        .filter-btn{padding:0.35rem 0.8rem;border-radius:8px;font-size:0.76rem;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-dim);transition:all 0.2s;font-family:'Plus Jakarta Sans',sans-serif;}
+        .filter-btn.active,.filter-btn:hover{background:var(--accent-soft);border-color:rgba(79,124,255,0.25);color:#a5bbff;}
+        .search-wrap{position:relative;}
+        .search-wrap i{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:0.82rem;}
+        .search-input{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:0.45rem 0.9rem 0.45rem 2.15rem;color:var(--text);font-size:0.8rem;font-family:'Plus Jakarta Sans',sans-serif;outline:none;width:200px;transition:all 0.2s;}
+        .search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
+        .search-input::placeholder{color:var(--text-faint);}
+        .flash-msg{padding:0.6rem 0.9rem;border-radius:10px;font-size:0.78rem;margin-bottom:1.1rem;display:flex;align-items:center;gap:0.45rem;animation:flashIn 0.3s ease;}
+        @keyframes flashIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+        .flash-success{background:var(--success-s);border:1px solid rgba(52,201,122,0.2);color:var(--success);}
+        .flash-info{background:var(--info-s);border:1px solid rgba(96,165,250,0.2);color:var(--info);}
+        .complaint-list{display:flex;flex-direction:column;gap:0.7rem;}
+        .cc{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.2rem 1.4rem;display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:start;transition:border-color 0.2s;animation:fadeUp 0.45s cubic-bezier(0.16,1,0.3,1) both;}
+        .cc:hover{border-color:var(--border-h);}
+        .cc.s-pending{border-left:3px solid var(--warning);}
+        .cc.s-progress{border-left:3px solid var(--info);}
+        .cc.s-resolved{border-left:3px solid var(--success);}
+        .cc-top{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.45rem;flex-wrap:wrap;}
+        .cc-subject{font-weight:700;font-size:0.92rem;}
+        .cat-tag{font-size:0.68rem;padding:0.15rem 0.55rem;border-radius:5px;background:var(--accent-soft);border:1px solid rgba(79,124,255,0.18);color:#a5bbff;}
+        .cat-tag.sec{background:rgba(240,84,84,0.08);border-color:rgba(240,84,84,0.18);color:#ffa5a5;}
+        .cc-user{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;}
+        .uav{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#e85d8a,#f97316);display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;}
+        .uname{font-size:0.84rem;font-weight:700;}
+        .uemail{font-size:0.73rem;color:var(--text-dim);}
+        .cc-desc{font-size:0.78rem;color:var(--text-dim);margin-bottom:0.38rem;}
+        .cc-date{font-size:0.7rem;color:var(--text-faint);display:flex;align-items:center;gap:0.3rem;}
+        .cc-right{display:flex;flex-direction:column;align-items:flex-end;gap:0.6rem;min-width:220px;}
+        .badge{padding:0.25rem 0.75rem;border-radius:20px;font-size:0.7rem;font-weight:700;}
+        .bp{background:var(--warning-s);border:1px solid rgba(232,169,60,0.22);color:var(--warning);}
+        .bi2{background:var(--info-s);border:1px solid rgba(96,165,250,0.22);color:var(--info);}
+        .br{background:var(--success-s);border:1px solid rgba(52,201,122,0.22);color:var(--success);}
+        .resp-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:0.5rem 0.7rem;color:var(--text);font-size:0.78rem;font-family:'Plus Jakarta Sans',sans-serif;outline:none;resize:none;transition:all 0.2s;}
+        .resp-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
+        .resp-input::placeholder{color:var(--text-faint);}
+        .action-row{display:flex;gap:0.4rem;align-items:center;width:100%;}
+        .st-select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0.42rem 0.65rem;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;outline:none;cursor:pointer;transition:all 0.2s;}
+        .st-select:focus{border-color:var(--accent);}
+        .st-select option{background:#181b23;}
+        .btn-save{padding:0.42rem 0.85rem;border-radius:8px;background:var(--success-s);border:1px solid rgba(52,201,122,0.22);color:var(--success);font-size:0.77rem;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;}
+        .btn-save:hover{background:rgba(52,201,122,0.18);}
+        .btn-del{padding:0.42rem 0.6rem;border-radius:8px;background:var(--danger-s);border:1px solid rgba(240,84,84,0.18);color:var(--danger);font-size:0.82rem;cursor:pointer;transition:all 0.2s;}
+        .btn-del:hover{background:rgba(240,84,84,0.18);}
+        /* ── Proof styles ── */
+        .proof-box{margin-top:0.5rem;padding:0.5rem 0.75rem;border-radius:9px;background:rgba(79,124,255,0.05);border:1px solid rgba(79,124,255,0.13);display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;}
+        .proof-label{font-size:0.68rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;}
+        .proof-img{max-width:160px;max-height:110px;border-radius:8px;border:1px solid var(--border-h);cursor:pointer;transition:transform 0.2s;}
+        .proof-img:hover{transform:scale(1.04);}
+        .proof-link{font-size:0.75rem;color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:0.28rem;padding:0.3rem 0.65rem;border-radius:7px;background:var(--accent-soft);border:1px solid rgba(79,124,255,0.18);transition:all 0.2s;}
+        .proof-link:hover{background:rgba(79,124,255,0.18);}
+        /* ── Lightbox ── */
+        .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:999;align-items:center;justify-content:center;}
+        .lightbox.open{display:flex;}
+        .lightbox img{max-width:90vw;max-height:88vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+        .lightbox-close{position:absolute;top:1.2rem;right:1.5rem;color:#fff;font-size:1.6rem;cursor:pointer;opacity:0.7;transition:opacity 0.2s;}
+        .lightbox-close:hover{opacity:1;}
+        /* ───────────────── */
+        .empty-state{text-align:center;padding:4rem 1rem;color:var(--text-dim);}
+        .empty-state i{font-size:2.8rem;opacity:0.18;display:block;margin-bottom:0.75rem;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+        @media(max-width:900px){.cc{grid-template-columns:1fr}.cc-right{align-items:flex-start;min-width:auto}}
+        @media(max-width:768px){.stats-grid{grid-template-columns:1fr 1fr}}
+    </style>
+</head>
+<body>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close"><i class="bi bi-x-lg"></i></span>
+    <img id="lightboxImg" src="" alt="Proof">
+</div>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <div class="nav-brand">ComplaintMS</div>
+        <span class="dept-badge">{{ category_icon }} {{ admin_category }}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.85rem;">
+        <span style="font-size:0.82rem;color:var(--text-dim);">{{ session['user'] }}</span>
+        <a href="/logout" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="dept-header">
+        <div class="dept-icon-big">{{ category_icon }}</div>
+        <div class="dept-info">
+            <h1>{{ admin_category }} Department</h1>
+            <p>You see only complaints routed to your department. Update status and respond below.</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card sc-p">
+            <div class="stat-label">Pending</div>
+            <div class="stat-val">{{ stats.pending }}</div>
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+        </div>
+        <div class="stat-card sc-i">
+            <div class="stat-label">In Progress</div>
+            <div class="stat-val">{{ stats.inprogress }}</div>
+            <div class="stat-icon"><i class="bi bi-arrow-repeat"></i></div>
+        </div>
+        <div class="stat-card sc-r">
+            <div class="stat-label">Resolved</div>
+            <div class="stat-val">{{ stats.resolved }}</div>
+            <div class="stat-icon"><i class="bi bi-check2-all"></i></div>
+        </div>
+    </div>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in msgs %}
+        <div class="flash-msg flash-{{ cat }}">
+            <i class="bi bi-check-circle-fill"></i>{{ msg }}
+        </div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="toolbar">
+        <div class="toolbar-title">Complaints — {{ admin_category }}</div>
+        <div class="filter-tabs">
+            <button class="filter-btn active" onclick="filterCC('all',this)">All ({{ stats.total }})</button>
+            <button class="filter-btn" onclick="filterCC('Pending',this)">Pending</button>
+            <button class="filter-btn" onclick="filterCC('In Progress',this)">In Progress</button>
+            <button class="filter-btn" onclick="filterCC('Resolved',this)">Resolved</button>
+        </div>
+        <div class="search-wrap">
+            <i class="bi bi-search"></i>
+            <input class="search-input" placeholder="Search complaints…" oninput="searchCC(this.value)">
+        </div>
+    </div>
+
+    <div class="complaint-list" id="ccList">
+        {% if complaints %}
+            {% for c in complaints %}
+            <div class="cc s-{{ 'progress' if c.status=='In Progress' else c.status.lower() }}"
+                 data-status="{{ c.status }}"
+                 data-search="{{ (c.subject+' '+c.name+' '+c.email+' '+c.description)|lower }}"
+                 style="animation-delay:{{ loop.index0 * 0.05 }}s">
+                <div>
+                    <div class="cc-top">
+                        <span class="cc-subject">{{ c.subject }}</span>
+                        <span class="cat-tag">{{ category_icons.get(c.primary_category,'📌') }} {{ c.primary_category }}</span>
+                        {% if c.secondary_category and c.secondary_category != 'None' %}
+                        <span class="cat-tag sec">{{ category_icons.get(c.secondary_category,'📌') }} {{ c.secondary_category }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="cc-user">
+                        <div class="uav">{{ c.name[0].upper() }}</div>
+                        <div><div class="uname">{{ c.name }}</div><div class="uemail">{{ c.email }}</div></div>
+                    </div>
+                    <div class="cc-desc">{{ c.description[:130] }}{% if c.description|length > 130 %}…{% endif %}</div>
+                    <!-- ── Proof / Evidence ── -->
+                    {% if c.proof_photo %}
+                    <div class="proof-box">
+                        <span class="proof-label">📎 Proof:</span>
+                        {% set ext = c.proof_photo.rsplit('.', 1)[-1].lower() %}
+                        {% if ext in ['jpg', 'jpeg', 'png'] %}
+                            <img class="proof-img"
+                                 src="{{ url_for('static', filename='uploads/' + c.proof_photo) }}"
+                                 alt="Proof"
+                                 onclick="openLightbox(this.src)">
+                        {% elif ext == 'pdf' %}
+                            <a class="proof-link" href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank">
+                                <i class="bi bi-file-earmark-pdf"></i> View PDF
+                            </a>
+                        {% elif ext == 'mp4' %}
+                            <a class="proof-link" href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank">
+                                <i class="bi bi-play-circle"></i> View Video
+                            </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <!-- ───────────────────── -->
+                    <div class="cc-date" style="margin-top:0.4rem;"><i class="bi bi-clock"></i>{{ c.date }}</div>
+                </div>
+                <div class="cc-right">
+                    <span class="badge {% if c.status=='Pending' %}bp{% elif c.status=='In Progress' %}bi2{% else %}br{% endif %}">{{ c.status }}</span>
+                    <form action="/update_status/{{ c._id }}" method="POST" style="width:100%;display:flex;flex-direction:column;gap:0.4rem;">
+                        <input type="hidden" name="redirect_to" value="admin_dashboard">
+                        <textarea class="resp-input" name="admin_response" rows="2" placeholder="Add a response (optional)…">{{ c.admin_response or '' }}</textarea>
+                        <div class="action-row">
+                            <select name="status" class="st-select">
+                                <option value="Pending" {% if c.status=='Pending' %}selected{% endif %}>Pending</option>
+                                <option value="In Progress" {% if c.status=='In Progress' %}selected{% endif %}>In Progress</option>
+                                <option value="Resolved" {% if c.status=='Resolved' %}selected{% endif %}>Resolved</option>
+                            </select>
+                            <button type="submit" class="btn-save"><i class="bi bi-check2"></i> Save</button>
+                        </div>
+                    </form>
+                    <form action="/delete_complaint/{{ c._id }}" method="POST" onsubmit="return confirm('Delete this complaint?')" style="width:100%;">
+                        <input type="hidden" name="redirect_to" value="admin_dashboard">
+                        <button type="submit" class="btn-del" style="width:100%;"><i class="bi bi-trash3"></i> Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <p>No complaints in your department yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function filterCC(s,btn){
+        document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.cc').forEach(c=>{
+            c.style.display=(s==='all'||c.dataset.status===s)?'':'none';
+        });
+    }
+    function searchCC(v){
+        const q=v.toLowerCase();
+        document.querySelectorAll('.cc').forEach(c=>{
+            c.style.display=c.dataset.search.includes(q)?'':'none';
+        });
+    }
+    function openLightbox(src){
+        document.getElementById('lightboxImg').src = src;
+        document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox(){
+        document.getElementById('lightbox').classList.remove('open');
+    }
+    document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
+</script>
+<script>
+    document.documentElement.style.opacity = '0';
+    window.addEventListener('DOMContentLoaded', () => {
+        document.documentElement.style.transition = 'opacity 0.4s ease';
+        document.documentElement.style.opacity = '1';
+    });
+    document.addEventListener('click', e => {
+        const a = e.target.closest('a');
+        if (a && !a.target && !a.href.includes('#') && !a.href.startsWith('javascript')) {
+            e.preventDefault();
+            document.documentElement.style.opacity = '0';
+            setTimeout(() => window.location.href = a.href, 280);
+        }
+    });
+</script>
+</body>
+</html>

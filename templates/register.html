@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS · Create Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0f1117; --surface: #181b23; --surface2: #1e2230;
+            --border: rgba(255,255,255,0.07); --border-hover: rgba(255,255,255,0.13);
+            --accent: #4f7cff; --accent-soft: rgba(79,124,255,0.1); --accent-glow: rgba(79,124,255,0.22);
+            --text: #e2e4ed; --text-dim: #8b8fa8; --text-faint: #4a4d5e;
+            --success: #34c97a; --danger: #f05454;
+            --success-soft: rgba(52,201,122,0.1); --danger-soft: rgba(240,84,84,0.1);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; align-items: center;
+            justify-content: center; overflow-x: hidden;
+        }
+        .bg-glow {
+            position: fixed; border-radius: 50%;
+            filter: blur(110px); pointer-events: none; z-index: 0;
+        }
+        .g1 { width: 420px; height: 420px; background: rgba(79,124,255,0.08); top: -100px; right: -80px; animation: gdrift 16s ease-in-out infinite; }
+        .g2 { width: 320px; height: 320px; background: rgba(52,201,122,0.06); bottom: -80px; left: -60px; animation: gdrift 20s ease-in-out infinite reverse 4s; }
+        @keyframes gdrift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,-15px)} }
+        .bg-grid {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image: linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px);
+            background-size: 54px 54px;
+        }
+
+        .wrapper {
+            position: relative; z-index: 10;
+            width: 100%; max-width: 440px; padding: 1.5rem;
+            animation: slideUp 0.55s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        @keyframes slideUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+
+        .brand { text-align: center; margin-bottom: 1.75rem; }
+        .brand-icon {
+            width: 54px; height: 54px; border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent), #6741d9);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 0.7rem;
+            box-shadow: 0 0 0 1px rgba(79,124,255,0.25), 0 10px 28px rgba(79,124,255,0.2);
+        }
+        .brand-name { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.02em; }
+        .brand-sub { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.2rem; }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 2.25rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .card-title { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.02em; margin-bottom: 0.2rem; }
+        .card-sub { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 1.75rem; }
+
+        /* Email notice */
+        .email-notice {
+            display: flex; align-items: flex-start; gap: 0.6rem;
+            background: rgba(79,124,255,0.07);
+            border: 1px solid rgba(79,124,255,0.18);
+            border-radius: 10px; padding: 0.75rem 0.9rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.78rem; color: #a5bbff; line-height: 1.55;
+        }
+        .email-notice i { font-size: 1rem; margin-top: 0.05rem; flex-shrink: 0; }
+
+        .flash-msg {
+            padding: 0.65rem 0.9rem; border-radius: 10px;
+            font-size: 0.8rem; margin-bottom: 1.1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+            animation: flashIn 0.3s ease;
+        }
+        @keyframes flashIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+        .flash-success { background: var(--success-soft); border: 1px solid rgba(52,201,122,0.2); color: var(--success); }
+        .flash-danger  { background: var(--danger-soft);  border: 1px solid rgba(240,84,84,0.2);  color: var(--danger); }
+
+        .form-group { margin-bottom: 1.1rem; }
+        label {
+            display: block; font-size: 0.7rem; font-weight: 700;
+            color: var(--text-dim); text-transform: uppercase;
+            letter-spacing: 0.07em; margin-bottom: 0.4rem;
+        }
+        .input-wrap { position: relative; }
+        .input-wrap i {
+            position: absolute; left: 0.95rem; top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-faint); font-size: 0.88rem;
+            pointer-events: none; transition: color 0.2s;
+        }
+        .input-wrap:focus-within i { color: var(--accent); }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%; background: var(--surface2);
+            border: 1px solid var(--border); border-radius: 11px;
+            padding: 0.82rem 1rem 0.82rem 2.6rem;
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.88rem;
+            transition: all 0.22s; outline: none;
+        }
+        input::placeholder { color: var(--text-faint); }
+        input:focus {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        /* Password strength */
+        .strength-wrap { margin-top: 0.45rem; }
+        .strength-bars { display: flex; gap: 4px; margin-bottom: 0.25rem; }
+        .sbar {
+            flex: 1; height: 3px; border-radius: 2px;
+            background: var(--border); transition: background 0.3s;
+        }
+        .strength-label {
+            font-size: 0.68rem; color: var(--text-faint);
+            transition: color 0.3s;
+        }
+
+        .btn-reg {
+            width: 100%; padding: 0.9rem;
+            background: linear-gradient(135deg, var(--accent), #6e5cf6);
+            border: none; border-radius: 12px; color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700; font-size: 0.88rem;
+            cursor: pointer; transition: all 0.22s;
+            display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+            margin-top: 0.35rem;
+            box-shadow: 0 4px 16px rgba(79,124,255,0.28);
+        }
+        .btn-reg:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(79,124,255,0.42); }
+        .btn-reg:active { transform: scale(0.985); }
+
+        .back-link {
+            text-align: center; color: var(--text-dim);
+            font-size: 0.78rem; margin-top: 1.35rem;
+        }
+        .back-link a { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .back-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="bg-glow g1"></div>
+<div class="bg-glow g2"></div>
+<div class="bg-grid"></div>
+
+<div class="wrapper">
+    <div class="brand">
+        <div class="brand-icon">📋</div>
+        <div class="brand-name">ComplaintMS</div>
+        <div class="brand-sub">Create your account</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Register</div>
+        <div class="card-sub">Submit and track complaints across departments</div>
+
+        <div class="email-notice">
+            <i class="bi bi-envelope-check"></i>
+            <span>After registration, a <strong>confirmation email</strong> will be sent to your registered address.</span>
+        </div>
+
+        {% with msgs = get_flashed_messages(with_categories=true) %}
+            {% for cat, msg in msgs %}
+            <div class="flash-msg flash-{{ cat }}">
+                <i class="bi bi-{{ 'check-circle-fill' if cat=='success' else 'exclamation-circle-fill' }}"></i>
+                {{ msg }}
+            </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form action="/register_action" method="POST">
+            <div class="form-group">
+                <label>Full Name</label>
+                <div class="input-wrap">
+                    <i class="bi bi-person"></i>
+                    <input type="text" name="name" placeholder="Your full name" required autocomplete="name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <div class="input-wrap">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" name="email" placeholder="you@example.com" required autocomplete="email">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrap">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" name="password" id="pwd" placeholder="Min. 6 characters" required minlength="6">
+                </div>
+                <div class="strength-wrap">
+                    <div class="strength-bars">
+                        <div class="sbar" id="s1"></div>
+                        <div class="sbar" id="s2"></div>
+                        <div class="sbar" id="s3"></div>
+                        <div class="sbar" id="s4"></div>
+                    </div>
+                    <div class="strength-label" id="slabel">Enter a password</div>
+                </div>
+            </div>
+            <button type="submit" class="btn-reg" id="submitBtn">
+                <i class="bi bi-person-plus-fill"></i> Create Account
+            </button>
+        </form>
+        <div class="back-link">Already have an account? <a href="/">Sign in</a></div>
+    </div>
+</div>
+
+<script>
+    const pwd = document.getElementById('pwd');
+    const bars = [document.getElementById('s1'), document.getElementById('s2'), document.getElementById('s3'), document.getElementById('s4')];
+    const slabel = document.getElementById('slabel');
+    const colors = ['#f05454','#f97316','#e8a93c','#34c97a'];
+    const labels = ['Too short', 'Weak', 'Fair', 'Strong'];
+
+    pwd.addEventListener('input', () => {
+        const v = pwd.value; let s = 0;
+        if (v.length >= 6) s++;
+        if (v.length >= 10) s++;
+        if (/[A-Z]/.test(v) && /[0-9]/.test(v)) s++;
+        if (/[^A-Za-z0-9]/.test(v)) s++;
+        bars.forEach((b, i) => {
+            b.style.background = i < s ? colors[s - 1] : 'var(--border)';
+        });
+        slabel.textContent = v.length === 0 ? 'Enter a password' : labels[Math.min(s - 1, 3)] || 'Too short';
+        slabel.style.color = v.length === 0 ? 'var(--text-faint)' : colors[Math.min(s - 1, 3)];
+    });
+
+    // Loading state on submit
+    document.querySelector('form').addEventListener('submit', () => {
+        const btn = document.getElementById('submitBtn');
+        btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Creating...';
+        btn.disabled = true;
+        btn.style.opacity = '0.75';
+    });
+</script>
+<script>
+    document.documentElement.style.opacity = '0';
+    window.addEventListener('DOMContentLoaded', () => {
+        document.documentElement.style.transition = 'opacity 0.4s ease';
+        document.documentElement.style.opacity = '1';
+    });
+    document.addEventListener('click', e => {
+        const a = e.target.closest('a');
+        if (a && !a.target && !a.href.includes('#') && !a.href.startsWith('javascript')) {
+            e.preventDefault();
+            document.documentElement.style.opacity = '0';
+            setTimeout(() => window.location.href = a.href, 280);
+        }
+    });
+</script>
+</body>
+</html>
