@@ -214,35 +214,20 @@
                         {% if c.admin_response %}
                         <div class="admin-resp">💬 {{ c.admin_response }}</div>
                         {% endif %}
-
-                        <!-- ── Proof Photo Display (Cloudinary URL) ── -->
+                        <!-- ── Proof Photo Display ── -->
                         {% if c.proof_photo %}
                         <div class="ci-proof">
-                            {% if c.proof_photo.startswith('http') %}
-                                {# ✅ Cloudinary URL — seedha use karo #}
-                                {% set fname = c.proof_photo.split('/')[-1].split('?')[0].lower() %}
-                                {% if fname.endswith('.pdf') %}
-                                    <a href="{{ c.proof_photo }}" target="_blank"><i class="bi bi-file-earmark-pdf"></i> View PDF Proof</a>
-                                {% elif fname.endswith('.mp4') %}
-                                    <a href="{{ c.proof_photo }}" target="_blank"><i class="bi bi-play-circle"></i> View Video Proof</a>
-                                {% else %}
-                                    <img src="{{ c.proof_photo }}" alt="Proof">
-                                {% endif %}
-                            {% else %}
-                                {# ⬅️ Purana local filename — backward compatible #}
-                                {% set ext = c.proof_photo.rsplit('.', 1)[-1].lower() %}
-                                {% if ext in ['jpg', 'jpeg', 'png'] %}
-                                    <img src="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" alt="Proof">
-                                {% elif ext == 'pdf' %}
-                                    <a href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank"><i class="bi bi-file-earmark-pdf"></i> View PDF Proof</a>
-                                {% elif ext == 'mp4' %}
-                                    <a href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank"><i class="bi bi-play-circle"></i> View Video Proof</a>
-                                {% endif %}
+                            {% set ext = c.proof_photo.rsplit('.', 1)[-1].lower() %}
+                            {% if ext in ['jpg', 'jpeg', 'png'] %}
+                                <img src="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" alt="Proof">
+                            {% elif ext == 'pdf' %}
+                                <a href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank"><i class="bi bi-file-earmark-pdf"></i> View PDF Proof</a>
+                            {% elif ext == 'mp4' %}
+                                <a href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank"><i class="bi bi-play-circle"></i> View Video Proof</a>
                             {% endif %}
                         </div>
                         {% endif %}
-                        <!-- ─────────────────────────────────────────── -->
-
+                        <!-- ───────────────────────── -->
                         <div class="ci-date"><i class="bi bi-clock"></i>{{ c.date }}</div>
                     </div>
                     <span class="badge {% if c.status=='Pending' %}bp{% elif c.status=='In Progress' %}bi2{% else %}br{% endif %}">{{ c.status }}</span>

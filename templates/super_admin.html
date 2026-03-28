@@ -250,21 +250,36 @@
                             <div><div class="uname">{{ c.name }}</div><div class="uemail">{{ c.email }}</div></div>
                         </div>
                         <div class="cc-desc">{{ c.description[:110] }}{% if c.description|length > 110 %}…{% endif %}</div>
-                        <!-- ── Proof / Evidence ── -->
+
+                        <!-- ── Proof / Evidence (Cloudinary URL) ── -->
                         {% if c.proof_photo %}
                         <div class="proof-box">
                             <span class="proof-label">📎 Proof:</span>
-                            {% set ext = c.proof_photo.rsplit('.', 1)[-1].lower() %}
-                            {% if ext in ['jpg', 'jpeg', 'png'] %}
-                                <img class="proof-img" src="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" alt="Proof" onclick="openLightbox(this.src)">
-                            {% elif ext == 'pdf' %}
-                                <a class="proof-link" href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank"><i class="bi bi-file-earmark-pdf"></i> View PDF</a>
-                            {% elif ext == 'mp4' %}
-                                <a class="proof-link" href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank"><i class="bi bi-play-circle"></i> View Video</a>
+                            {% if c.proof_photo.startswith('http') %}
+                                {# ✅ Cloudinary URL — seedha use karo #}
+                                {% set fname = c.proof_photo.split('/')[-1].split('?')[0].lower() %}
+                                {% if fname.endswith('.pdf') %}
+                                    <a class="proof-link" href="{{ c.proof_photo }}" target="_blank"><i class="bi bi-file-earmark-pdf"></i> View PDF</a>
+                                {% elif fname.endswith('.mp4') %}
+                                    <a class="proof-link" href="{{ c.proof_photo }}" target="_blank"><i class="bi bi-play-circle"></i> View Video</a>
+                                {% else %}
+                                    <img class="proof-img" src="{{ c.proof_photo }}" alt="Proof" onclick="openLightbox(this.src)">
+                                {% endif %}
+                            {% else %}
+                                {# ⬅️ Purana local filename — backward compatible #}
+                                {% set ext = c.proof_photo.rsplit('.', 1)[-1].lower() %}
+                                {% if ext in ['jpg', 'jpeg', 'png'] %}
+                                    <img class="proof-img" src="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" alt="Proof" onclick="openLightbox(this.src)">
+                                {% elif ext == 'pdf' %}
+                                    <a class="proof-link" href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank"><i class="bi bi-file-earmark-pdf"></i> View PDF</a>
+                                {% elif ext == 'mp4' %}
+                                    <a class="proof-link" href="{{ url_for('static', filename='uploads/' + c.proof_photo) }}" target="_blank"><i class="bi bi-play-circle"></i> View Video</a>
+                                {% endif %}
                             {% endif %}
                         </div>
                         {% endif %}
-                        <!-- ───────────────────── -->
+                        <!-- ──────────────────────────────────────── -->
+
                         <div class="cc-date"><i class="bi bi-clock"></i>{{ c.date }}</div>
                     </div>
                     <div class="cc-right">

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS · Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0f1117;
+            --surface: #181b23;
+            --surface2: #1e2230;
+            --border: rgba(255,255,255,0.07);
+            --border-hover: rgba(255,255,255,0.14);
+            --accent: #4f7cff;
+            --accent-soft: rgba(79,124,255,0.12);
+            --accent-glow: rgba(79,124,255,0.25);
+            --gold: #e8a93c;
+            --gold-soft: rgba(232,169,60,0.12);
+            --text: #e2e4ed;
+            --text-dim: #8b8fa8;
+            --text-faint: #4a4d5e;
+            --success: #34c97a;
+            --danger: #f05454;
+            --success-soft: rgba(52,201,122,0.12);
+            --danger-soft: rgba(240,84,84,0.12);
+        }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Background */
+        .bg-canvas { position: fixed; inset: 0; z-index: 0; }
+        .bg-glow {
+            position: absolute; border-radius: 50%; filter: blur(120px); pointer-events: none;
+        }
+        .glow-1 { width: 480px; height: 480px; background: rgba(79,124,255,0.09); top: -120px; left: -80px; animation: drift 18s ease-in-out infinite; }
+        .glow-2 { width: 380px; height: 380px; background: rgba(232,169,60,0.07); bottom: -100px; right: -60px; animation: drift 22s ease-in-out infinite reverse; }
+        .glow-3 { width: 280px; height: 280px; background: rgba(79,124,255,0.05); top: 50%; left: 55%; animation: drift 14s ease-in-out infinite 6s; }
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33%  { transform: translate(18px, -18px) scale(1.04); }
+            66%  { transform: translate(-12px, 12px) scale(0.97); }
+        }
+        .bg-grid {
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+            background-size: 56px 56px;
+            pointer-events: none;
+        }
+
+        /* Layout */
+        .page {
+            position: relative; z-index: 10;
+            display: grid;
+            grid-template-columns: 1fr 440px;
+            gap: 5rem;
+            width: 100%; max-width: 1040px;
+            padding: 2rem;
+            align-items: center;
+        }
+
+        /* Left */
+        .left { animation: slideInLeft 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+        @keyframes slideInLeft { from { opacity:0; transform:translateX(-32px); } to { opacity:1; transform:translateX(0); } }
+
+        .brand {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+        .brand-icon {
+            width: 46px; height: 46px; border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), #7b5cf6);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 0 0 1px rgba(79,124,255,0.3), 0 8px 24px rgba(79,124,255,0.2);
+        }
+        .brand-name {
+            font-weight: 800; font-size: 1.05rem;
+            letter-spacing: -0.02em;
+        }
+        .brand-tag {
+            font-size: 0.65rem; color: var(--text-dim);
+            font-weight: 500; letter-spacing: 0.04em;
+        }
+
+        .hero-title {
+            font-weight: 800;
+            font-size: clamp(1.85rem, 3vw, 2.6rem);
+            line-height: 1.18;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        .hero-title em {
+            font-style: normal;
+            background: linear-gradient(120deg, var(--accent), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-desc {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            line-height: 1.75;
+            max-width: 360px;
+            margin-bottom: 2rem;
+        }
+
+        .dept-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.1rem 1.35rem;
+        }
+        .dept-label {
+            font-size: 0.68rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--text-faint);
+            margin-bottom: 0.8rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .dept-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+        .chip {
+            font-size: 0.7rem; padding: 0.26rem 0.65rem;
+            border-radius: 20px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            transition: all 0.2s;
+            animation: chipPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        .chip:hover { border-color: var(--border-hover); color: var(--text); background: rgba(79,124,255,0.08); }
+        @keyframes chipPop { from { opacity:0; transform:scale(0.75); } to { opacity:1; transform:scale(1); } }
+
+        /* Auth card */
+        .auth-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+            animation: slideInRight 0.7s cubic-bezier(0.16,1,0.3,1) 0.1s both;
+        }
+        @keyframes slideInRight { from { opacity:0; transform:translateX(32px); } to { opacity:1; transform:translateX(0); } }
+
+        /* Tabs */
+        .tab-bar {
+            display: grid; grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            padding: 1rem; text-align: center; border: none;
+            background: transparent; color: var(--text-dim);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700; font-size: 0.8rem;
+            letter-spacing: 0.02em; cursor: pointer;
+            transition: all 0.25s; position: relative;
+        }
+        .tab-btn i { margin-right: 0.3rem; font-size: 0.85rem; }
+        .tab-btn::after {
+            content: ''; position: absolute;
+            bottom: -1px; left: 20%; right: 20%;
+            height: 2px; border-radius: 1px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .tab-btn.active { color: var(--text); }
+        .tab-btn.active::after { transform: scaleX(1); }
+        .tab-btn.admin-tab.active { color: var(--gold); }
+        .tab-btn.admin-tab.active::after { background: var(--gold); }
+
+        /* Panels */
+        .panel { padding: 2rem 2.25rem; display: none; }
+        .panel.active { display: block; animation: panelSlideIn 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+        @keyframes panelSlideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+        .panel-title { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; margin-bottom: 0.2rem; }
+        .panel-sub { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 1.6rem; }
+        .admin-panel .panel-title { color: var(--gold); }
+
+        .admin-badge {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.22rem 0.65rem; border-radius: 6px;
+            background: var(--gold-soft);
+            border: 1px solid rgba(232,169,60,0.2);
+            font-size: 0.65rem; font-weight: 700;
+            color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em;
+            margin-bottom: 0.85rem;
+        }
+
+        /* Flash */
+        .flash {
+            padding: 0.65rem 0.9rem; border-radius: 10px;
+            font-size: 0.8rem; margin-bottom: 1.1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+            animation: flashIn 0.3s ease;
+        }
+        @keyframes flashIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+        .flash-success { background: var(--success-soft); border: 1px solid rgba(52,201,122,0.2); color: var(--success); }
+        .flash-danger  { background: var(--danger-soft);  border: 1px solid rgba(240,84,84,0.2);  color: var(--danger); }
+
+        /* Form */
+        .form-group { margin-bottom: 1.1rem; }
+        label {
+            display: block; font-size: 0.7rem; font-weight: 700;
+            color: var(--text-dim); text-transform: uppercase;
+            letter-spacing: 0.07em; margin-bottom: 0.4rem;
+        }
+        .input-wrap { position: relative; }
+        .input-wrap i {
+            position: absolute; left: 0.95rem; top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-faint); font-size: 0.88rem;
+            pointer-events: none; transition: color 0.2s;
+        }
+        .input-wrap:focus-within i { color: var(--accent); }
+        .admin-panel .input-wrap:focus-within i { color: var(--gold); }
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 0.82rem 1rem 0.82rem 2.6rem;
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.88rem;
+            transition: all 0.22s; outline: none;
+        }
+        input::placeholder { color: var(--text-faint); }
+        .user-panel input:focus {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .admin-panel input:focus {
+            border-color: var(--gold);
+            background: var(--gold-soft);
+            box-shadow: 0 0 0 3px rgba(232,169,60,0.15);
+        }
+
+        .forgot-link {
+            text-align: right; margin-top: -0.6rem; margin-bottom: 1rem;
+        }
+        .forgot-link a {
+            color: var(--text-faint); font-size: 0.75rem;
+            text-decoration: none; transition: color 0.2s;
+        }
+        .forgot-link a:hover { color: var(--accent); }
+
+        /* Buttons */
+        .btn {
+            width: 100%; padding: 0.88rem; border: none;
+            border-radius: 12px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700; font-size: 0.88rem;
+            letter-spacing: 0.02em; cursor: pointer;
+            transition: all 0.22s;
+            display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+            margin-top: 0.35rem; position: relative; overflow: hidden;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:active { transform: translateY(0) scale(0.985); }
+        .btn-user {
+            background: linear-gradient(135deg, var(--accent), #6e5cf6);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(79,124,255,0.28);
+        }
+        .btn-user:hover { box-shadow: 0 8px 28px rgba(79,124,255,0.42); }
+        .btn-admin {
+            background: linear-gradient(135deg, #c8870f, var(--gold));
+            color: #0f0f0f;
+            box-shadow: 0 4px 16px rgba(232,169,60,0.22);
+        }
+        .btn-admin:hover { box-shadow: 0 8px 28px rgba(232,169,60,0.36); }
+
+        .divider {
+            display: flex; align-items: center; gap: 0.65rem;
+            margin: 1.4rem 0 1.1rem;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; height: 1px;
+            background: rgba(232,169,60,0.15);
+        }
+        .divider span { font-size: 0.65rem; color: rgba(232,169,60,0.4); text-transform: uppercase; letter-spacing: 0.1em; }
+
+        .reg-link {
+            text-align: center; color: var(--text-dim);
+            font-size: 0.78rem; margin-top: 1.35rem;
+        }
+        .reg-link a { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .reg-link a:hover { text-decoration: underline; }
+
+        /* Footer strip */
+        .card-footer {
+            padding: 0.75rem 2.25rem;
+            border-top: 1px solid var(--border);
+            background: rgba(0,0,0,0.12);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .fc { display: flex; flex-wrap: wrap; gap: 0.28rem; }
+        .fchip {
+            font-size: 0.62rem; padding: 0.12rem 0.45rem;
+            border-radius: 4px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+        .fnote { font-size: 0.65rem; color: var(--text-faint); }
+
+        @media (max-width: 820px) {
+            .page { grid-template-columns: 1fr; }
+            .left { display: none; }
+            .auth-card { max-width: 440px; margin: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-canvas">
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+    <div class="bg-glow glow-3"></div>
+</div>
+<div class="bg-grid"></div>
+
+<div class="page">
+
+    <!-- Left branding -->
+    <div class="left">
+        <div class="brand">
+            <div class="brand-icon">📋</div>
+            <div>
+                <div class="brand-name">KRMU Portal</div>
+                <div class="brand-tag">Official Complaint Management System </div>
+            </div>
+        </div>
+        <h1 class="hero-title">
+            Your Voice Matters.<br>
+            <em>We Listen</em><br>
+            
+        </h1>
+        <p class="hero-desc">
+            Every complaint reaches the right department instantly — no manual forwarding, no delays. Submit once and track in real-time.
+        </p>
+        <div class="dept-panel">
+            <div class="dept-label">Auto-Routed Departments</div>
+            <div class="chips">
+                {% for cat in categories %}
+                <span class="chip" style="animation-delay:{{ loop.index0 * 0.04 }}">
+                    {{ category_icons[cat] }} {{ cat }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth card -->
+    <div class="auth-card">
+        <div class="tab-bar">
+            <button class="tab-btn active" id="tabUser" onclick="switchTab('user')">
+                <i class="bi bi-person-fill"></i> Student / User
+            </button>
+            <button class="tab-btn admin-tab" id="tabAdmin" onclick="switchTab('admin')">
+                <i class="bi bi-shield-lock-fill"></i> Admin Portal
+            </button>
+        </div>
+
+        <!-- User panel -->
+        <div class="panel user-panel active" id="panelUser">
+            <div class="panel-title">Welcome back</div>
+            <div class="panel-sub">Sign in to submit and track your complaints</div>
+
+            {% with msgs = get_flashed_messages(with_categories=true) %}
+                {% for cat, msg in msgs %}
+                <div class="flash flash-{{ cat }}">
+                    <i class="bi bi-{{ 'check-circle-fill' if cat == 'success' else 'exclamation-circle-fill' }}"></i>
+                    {{ msg }}
+                </div>
+                {% endfor %}
+            {% endwith %}
+
+            <form action="/login_action" method="POST">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-envelope"></i>
+                        <input type="email" name="email" placeholder="you@example.com" required autocomplete="email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-lock"></i>
+                        <input type="password" name="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div class="forgot-link">
+                    <a href="/forgot_password">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn btn-user">
+                    <i class="bi bi-arrow-right-circle-fill"></i> Sign In
+                </button>
+            </form>
+            <div class="reg-link">New here? <a href="/register_page">Create an account</a></div>
+        </div>
+
+        <!-- Admin panel -->
+        <div class="panel admin-panel" id="panelAdmin">
+            <div class="admin-badge"><i class="bi bi-shield-check"></i> Restricted Access</div>
+            <div class="panel-title">Admin Portal</div>
+            <div class="panel-sub">Authorised department staff only</div>
+
+            <form action="/login_action" method="POST">
+                <div class="form-group">
+                    <label>Admin Email</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-envelope-fill"></i>
+                        <input type="email" name="email" placeholder="dept.admin@cms.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Admin Password</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-key-fill"></i>
+                        <input type="password" name="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div class="divider"><span>Secure Access</span></div>
+                <button type="submit" class="btn btn-admin">
+                    <i class="bi bi-shield-lock-fill"></i> Access Dashboard
+                </button>
+            </form>
+        </div>
+
+        <div class="card-footer">
+            <div class="fc">
+                <span class="fchip">🏠 Hostel</span>
+                <span class="fchip">🚌 Transport</span>
+                <span class="fchip">💰 Finance</span>
+                <span class="fchip">📚 Academic</span>
+                <span class="fchip">+ 7 more</span>
+            </div>
+            <span class="fnote">11 departments</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function switchTab(tab) {
+        const isAdmin = tab === 'admin';
+        document.getElementById('tabUser').classList.toggle('active', !isAdmin);
+        document.getElementById('tabAdmin').classList.toggle('active', isAdmin);
+        const pu = document.getElementById('panelUser');
+        const pa = document.getElementById('panelAdmin');
+        if (isAdmin) {
+            pu.classList.remove('active'); pu.style.display = 'none';
+            pa.style.display = 'block'; pa.offsetHeight; pa.classList.add('active');
+        } else {
+            pa.classList.remove('active'); pa.style.display = 'none';
+            pu.style.display = 'block'; pu.offsetHeight; pu.classList.add('active');
+        }
+    }
+</script>
+<script>
+    document.documentElement.style.opacity = '0';
+    window.addEventListener('DOMContentLoaded', () => {
+        document.documentElement.style.transition = 'opacity 0.4s ease';
+        document.documentElement.style.opacity = '1';
+    });
+    document.addEventListener('click', e => {
+        const a = e.target.closest('a');
+        if (a && !a.target && !a.href.includes('#') && !a.href.startsWith('javascript')) {
+            e.preventDefault();
+            document.documentElement.style.opacity = '0';
+            setTimeout(() => window.location.href = a.href, 280);
+        }
+    });
+</script>
+</body>
+</html>

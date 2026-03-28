@@ -1,3 +1,12 @@
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+    cloud_name="dz75m9jmk",
+    api_key="868437214112492",
+    api_secret="xcuENmEuEFHbRQX6TkT0NLUIaHc"
+)
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -10,10 +19,7 @@ app = Flask(__name__)
 app.secret_key = "cms_v2_secure_2026"
 
 # ── Upload Config ────────────────────────────────────────────────────
-UPLOAD_FOLDER    = os.path.join('static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'pdf', 'mp4'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -347,15 +353,18 @@ def submit_complaint():
     secondary = request.form.get('secondary_category', 'None')
     if secondary == primary: secondary = 'None'
 
-    # ── Photo / Proof Upload ─────────────────────────────────────────
-    photo_filename = None
+    # ── Photo / Proof Upload → Cloudinary ───────────────────────────
+    photo_url = ""
     if 'proof_photo' in request.files:
         file = request.files['proof_photo']
         if file and file.filename != '' and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filename = f"{int(time.time())}_{filename}"
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            photo_filename = filename
+            # ✅ Seedha Cloudinary pe upload — local save nahi hoga
+            upload_result = cloudinary.uploader.upload(
+                file,
+                folder="complainx_proofs",        # Cloudinary me folder name
+                resource_type="auto"               # image + pdf + video sab handle karega
+            )
+            photo_url = upload_result["secure_url"]  # ✅ ye URL MongoDB me jayega
     # ────────────────────────────────────────────────────────────────
 
     complaints_col.insert_one({
@@ -365,7 +374,7 @@ def submit_complaint():
         "primary_category":   primary,
         "secondary_category": secondary,
         "description":        request.form.get('description', '').strip(),
-        "proof_photo":        photo_filename,
+        "proof_photo":        photo_url,           # ✅ ab filename nahi, full Cloudinary URL save hoga
         "status":             "Pending",
         "created_at":         datetime.datetime.now(),
         "date":               datetime.datetime.now().strftime("%d %b %Y, %H:%M"),
