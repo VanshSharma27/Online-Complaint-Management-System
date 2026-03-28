@@ -44,7 +44,7 @@ SMTP_HOST     = os.environ.get("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT     = int(os.environ.get("SMTP_PORT", "587"))
 SMTP_USER     = os.environ.get("SMTP_USER", "your_email@gmail.com")
 SMTP_PASS     = os.environ.get("SMTP_PASS", "your_app_password")
-APP_BASE_URL  = os.environ.get("APP_BASE_URL", "http://localhost:5000")
+APP_BASE_URL = os.environ.get("APP_BASE_URL", "https://complainx-api.onrender.com")
 
 # ── Email Helper ─────────────────────────────────────────────────────
 def send_email(to_email, subject, html_body):
