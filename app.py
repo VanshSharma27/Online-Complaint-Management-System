@@ -19,12 +19,25 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # ── MongoDB ──────────────────────────────────────────────────────────
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
-client     = MongoClient(MONGO_URI)
-db         = client["complaint_system_v2"]
-users_col      = db["users"]
+import os
+from pymongo import MongoClient
+
+# Environment variable se MongoDB URI lo (Atlas ke liye)
+MONGO_URI = os.environ.get(
+    "MONGO_URI",
+    "mongodb+srv://AdminMaster27:Vansh9953501877@cluster0.xfwdpuf.mongodb.net/complaint_system_v2?retryWrites=true&w=majority"
+)
+
+# MongoDB client connect
+client = MongoClient(MONGO_URI)
+
+# Database select
+db = client["complaint_system_v2"]
+
+# Collections
+users_col = db["users"]
 complaints_col = db["complaints"]
-tokens_col     = db["password_reset_tokens"]
+tokens_col = db["password_reset_tokens"]
 
 # ── Email Config (set these env vars or edit directly) ───────────────
 SMTP_HOST     = os.environ.get("SMTP_HOST", "smtp.gmail.com")
